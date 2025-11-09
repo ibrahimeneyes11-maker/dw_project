@@ -1,1 +1,114 @@
+create or replace procedure bronze_dataset_load()
+language plpgsql
+as $$
+declare
+	start_time timestamp;
+	end_time timestamp;
+	duration interval;
+	batch_start_time timestamp;
+	batch_end_time timestamp;
+	batch_duration interval;
+begin
+	raise notice 'loading bronze layer!!!!!!!!!!';
+	batch_start_time := clock_timestamp();
+		begin 
+			raise notice 'truncating crm_cust_info table ######';
+			start_time := clock_timestamp();
+			truncate table bronze.crm_cust_info;
+			raise notice 'table truncated, loading dataset ++++++';
+			copy bronze.crm_cust_info
+			from '/tmp/cust_info.csv'
+			delimiter ','
+			csv header;
+			end_time:= clock_timestamp();
+			duration := end_time-start_time;
+			raise notice '>> Load duration: %seconds', extract(second from duration);
+			raise notice'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>';
+
+
+			start_time := clock_timestamp();
+			raise notice 'truncating crm_prd_info table ######';
+			truncate table bronze.crm_prd_info;
+			raise notice 'table truncated, loading dataset ++++++';
+			copy bronze.crm_prd_info
+			from '/tmp/prd_info.csv'
+			delimiter ','
+			csv header;
+			end_time:= clock_timestamp();
+			duration := end_time-start_time;
+			raise notice '>> Load duration: %seconds', extract(second from duration);
+			raise notice'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>';
+
+
+			start_time := clock_timestamp();
+			raise notice 'truncating crm_sales_details table ######';
+			truncate table bronze.crm_sales_details;
+			raise notice 'table truncated, loading dataset ++++++';
+			copy bronze.crm_sales_details
+			from '/tmp/sales_details.csv'
+			delimiter ','
+			csv header;
+			end_time:= clock_timestamp();
+			duration := end_time-start_time;
+			raise notice '>> Load duration: %seconds', extract(second from duration);
+			raise notice'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>';
+
+
+			start_time := clock_timestamp();
+			raise notice 'truncating erp_cust_az12 table ######';
+			truncate table bronze.erp_cust_az12;
+			raise notice 'table truncated, loading dataset ++++++';
+			copy bronze.erp_cust_az12
+			from '/tmp/CUST_AZ12.csv'
+			delimiter ','
+			csv header;
+			end_time:= clock_timestamp();
+			duration := end_time-start_time;
+			raise notice '>> Load duration: %seconds', extract(second from duration);
+			raise notice'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>';
+
+
+			start_time := clock_timestamp();
+			raise notice 'truncating erp_loc_a101 table ######';
+			truncate table bronze.erp_loc_a101;
+			raise notice 'table truncated, loading dataset ++++++';
+			copy bronze.erp_loc_a101
+			from '/tmp/LOC_A101.csv'
+			delimiter ','
+			csv header;
+			end_time:= clock_timestamp();
+			duration := end_time-start_time;
+			raise notice '>> Load duration: %seconds', extract(second from duration);
+			raise notice'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>';
+
+
+			start_time := clock_timestamp();
+			raise notice 'truncating erp_px_cat_g1v2 table ######';
+			truncate table bronze.erp_px_cat_g1v2;
+			raise notice 'table truncated, loading dataset ++++++';
+			copy bronze.erp_px_cat_g1v2
+			from '/tmp/PX_CAT_G1V2.csv'
+			delimiter ','
+			csv header;
+			end_time:= clock_timestamp();
+			duration := end_time-start_time;
+			raise notice '>> Load duration: %seconds', extract(second from duration);
+			raise notice'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>';
+	
+			raise notice 'bronze layer load successful';
+		exception
+			when others then
+			raise notice '============================================';
+			raise notice 'Error occured loading bronze layer';
+			raise notice 'Error message %', sqlerrm;
+			raise notice '============================================';
+		end;
+	batch_end_time := clock_timestamp();
+	batch_duration := batch_end_time-batch_start_time;
+	raise notice '>> Load batch duration: %seconds', extract(second from batch_duration);
+end;
+$$;
+
+
+call bronze_dataset_load();
 
