@@ -1,3 +1,5 @@
+-- defines the bronze layer of the data warehouse
+
 create or replace procedure bronze_dataset_load()
 language plpgsql
 as $$
